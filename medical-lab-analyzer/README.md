@@ -2,6 +2,14 @@
 
 تطبيق ويب شامل لإدارة الفحوصات الطبية وتحليل الصور وتوليد التقارير باستخدام الذكاء الاصطناعي.
 
+## 🚀 النشر السريع
+
+### النشر على Vercel (موصى به)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/medical-lab-analyzer)
+
+### النشر على Netlify
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/your-username/medical-lab-analyzer)
+
 ## المميزات الرئيسية
 
 ### 🔐 نظام إدارة المستخدمين
@@ -123,6 +131,36 @@ npm run dev
 http://localhost:3000
 ```
 
+## النشر
+
+### النشر على Vercel (موصى به)
+1. اذهب إلى [Vercel](https://vercel.com)
+2. اضغط "New Project"
+3. اختر المستودع `medical-lab-analyzer`
+4. اضبط متغيرات البيئة
+5. اضغط "Deploy"
+
+### النشر على Docker
+```bash
+# بناء الصورة
+docker build -t medical-lab-analyzer .
+
+# تشغيل الحاوية
+docker run -p 3000:3000 medical-lab-analyzer
+
+# أو استخدام Docker Compose
+docker-compose up -d
+```
+
+### النشر على الخادم المحلي
+```bash
+# بناء التطبيق
+npm run build
+
+# تشغيل التطبيق
+npm start
+```
+
 ## هيكل المشروع
 
 ```
@@ -143,8 +181,9 @@ medical-lab-analyzer/
 │   └── utils/                 # الدوال المساعدة
 ├── public/                    # الملفات العامة
 ├── database/                  # ملفات قاعدة البيانات
-├── reports/                   # قوالب التقارير
-└── docs/                      # الوثائق
+├── scripts/                   # سكربتات الإعداد
+├── docs/                      # الوثائق
+└── .github/                   # إعدادات GitHub
 ```
 
 ## الميزات المتقدمة
@@ -172,17 +211,18 @@ medical-lab-analyzer/
 
 ## المساهمة
 
-نرحب بمساهماتكم! يرجى اتباع الخطوات التالية:
+نرحب بمساهماتكم! يرجى قراءة [دليل المساهمة](CONTRIBUTING.md) للبدء.
 
+### كيفية المساهمة
 1. Fork المشروع
 2. إنشاء فرع للميزة الجديدة (`git checkout -b feature/amazing-feature`)
-3. Commit التغييرات (`git commit -m 'Add amazing feature'`)
+3. الالتزام بالتغييرات (`git commit -m 'Add amazing feature'`)
 4. Push للفرع (`git push origin feature/amazing-feature`)
 5. فتح Pull Request
 
 ## الترخيص
 
-هذا المشروع مرخص تحت رخصة MIT. راجع ملف `LICENSE` للتفاصيل.
+هذا المشروع مرخص تحت رخصة MIT. راجع ملف [LICENSE](LICENSE) للتفاصيل.
 
 ## الدعم
 
@@ -190,6 +230,7 @@ medical-lab-analyzer/
 - 📧 البريد الإلكتروني: support@medicallab.com
 - 📱 الهاتف: +966-50-123-4567
 - 🌐 الموقع: https://medicallab.com
+- 📖 الوثائق: [SUPPORT.md](SUPPORT.md)
 
 ## التطوير المستقبلي
 
@@ -208,6 +249,16 @@ medical-lab-analyzer/
 - [ ] دعم قواعد بيانات متقدمة
 - [ ] تحسين واجهة المستخدم
 
+## الإحصائيات
+
+![GitHub stars](https://img.shields.io/github/stars/your-username/medical-lab-analyzer?style=social)
+![GitHub forks](https://img.shields.io/github/forks/your-username/medical-lab-analyzer?style=social)
+![GitHub issues](https://img.shields.io/github/issues/your-username/medical-lab-analyzer)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/your-username/medical-lab-analyzer)
+![GitHub license](https://img.shields.io/github/license/your-username/medical-lab-analyzer)
+
 ---
 
 **ملاحظة**: هذا التطبيق مخصص للاستخدام الطبي ويجب أن يتم تشغيله وفقاً للمعايير الطبية والتنظيمية المحلية.
+
+**⭐ إذا أعجبك هذا المشروع، لا تنس إعطاءه نجمة على GitHub!**
