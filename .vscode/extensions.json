@@ -11,32 +11,6 @@
     "ms-vscode.vscode-docker",
     "github.vscode-pull-request-github",
     "ms-vscode.vscode-jest",
-    "ms-vscode.vscode-jest-runner",
-    "ms-vscode.vscode-coverage-gutters",
-    "streetsidesoftware.code-spell-checker",
-    "ms-vscode.vscode-git-graph",
-    "eamodio.gitlens",
-    "ms-vscode.vscode-js-debug",
-    "ms-vscode.vscode-js-debug-companion",
-    "ms-vscode.vscode-js-profile-flame",
-    "ms-vscode.vscode-js-profile-table",
-    "bradlc.vscode-tailwindcss",
-    "ms-vscode.vscode-css-peek",
-    "prisma.prisma",
-    "ms-vscode.vscode-sqlite",
-    "ms-vscode.vscode-node-debug2",
-    "ms-vscode.vscode-node-debug",
-    "ms-vscode.vscode-js-debug",
-    "ms-vscode.vscode-js-debug-companion",
-    "ms-vscode.vscode-js-profile-flame",
-    "ms-vscode.vscode-js-profile-table",
-    "ms-vscode.vscode-js-debug",
-    "ms-vscode.vscode-js-debug-companion",
-    "ms-vscode.vscode-js-profile-flame",
-    "ms-vscode.vscode-js-profile-table"
-  ],
-  "unwantedRecommendations": [
-    "ms-vscode.vscode-typescript",
-    "ms-vscode.vscode-javascript"
+    "ms-vscode.vscode-coverage-gutters"
   ]
 }
