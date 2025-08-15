@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { User, Lock, Eye, EyeOff, Activity, Users, FileText, BarChart3 } from "lucide-react";
+import { User, Lock, Eye, EyeOff, Activity, Users, FileText, BarChart3, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
@@ -80,6 +81,16 @@ export default function Home() {
                 <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
                   تسجيل الدخول
                 </Button>
+                
+                {/* Demo Link */}
+                <div className="text-center pt-4">
+                  <Link href="/dashboard">
+                    <Button type="button" variant="outline" className="w-full">
+                      عرض النسخة التجريبية
+                      <ArrowRight className="w-4 h-4 mr-2" />
+                    </Button>
+                  </Link>
+                </div>
               </form>
             </CardContent>
           </Card>
