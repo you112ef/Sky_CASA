@@ -51,7 +51,6 @@ next-env.d.ts
 *.log
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
