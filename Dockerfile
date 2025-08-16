@@ -10,7 +10,6 @@ WORKDIR /src
 # Copy project files
 COPY MedicalLabAnalyzer.csproj ./
 COPY Database/ ./Database/
-COPY Reports/ ./Reports/
 COPY UserGuides/ ./UserGuides/
 
 # Restore dependencies

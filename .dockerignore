@@ -1,0 +1,78 @@
+# Git
+.git
+.gitignore
+.github
+
+# Build artifacts
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Documentation
+*.md
+README*
+AUTOMATIC-DEPLOYMENT.md
+BUILD-*.md
+COMPLETE-*.md
+REAL-*.md
+
+# Scripts
+*.sh
+*.bat
+*.ps1
+Makefile
+build-*.sh
+build-*.bat
+build-*.ps1
+
+# Docker
+docker-compose.yml
+Dockerfile*
+.dockerignore
+
+# Database (keep only structure, not data)
+Database/*.db
+Database/*.db-journal
+Database/*.db-wal
+Database/*.db-shm
+
+# Test projects
+SimpleTest/
+Test/
+
+# Package files
+packages-microsoft-prod.deb
+
+# Styles and Views (WPF specific)
+Styles/
+Views/
+ViewModels/
+App.xaml
+App.xaml.cs
+Program.cs
+
+# Next.js project (separate build)
+medical-lab-analyzer/
+
+# Local build scripts
+build-local.sh
+build-local.bat
+build-test.sh
