@@ -25,6 +25,15 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
     
+    <!-- Dapper for better performance -->
+    <PackageReference Include="Dapper" Version="2.1.15" />
+    <PackageReference Include="Dapper.Contrib" Version="2.1.15" />
+    
+    <!-- Prism for MVVM -->
+    <PackageReference Include="Prism.Core" Version="8.1.97" />
+    <PackageReference Include="Prism.Wpf" Version="8.1.97" />
+    <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
+    
     <!-- Video Processing - Platform Specific -->
     <PackageReference Include="Emgu.CV" Version="4.8.1.5350" Condition="'$(TargetFramework)' == 'net8.0-windows'" />
     <PackageReference Include="Emgu.CV.runtime.windows" Version="4.8.1.5350" Condition="'$(TargetFramework)' == 'net8.0-windows'" />
