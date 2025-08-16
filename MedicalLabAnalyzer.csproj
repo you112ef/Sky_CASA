@@ -1,0 +1,97 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net8.0-windows;net8.0-macos;net8.0-linux</TargetFrameworks>
+    <UseWPF Condition="'$(TargetFramework)' == 'net8.0-windows'">true</UseWPF>
+    <UseAvalonia Condition="'$(TargetFramework)' != 'net8.0-windows'">true</UseAvalonia>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Resources\app.ico</ApplicationIcon>
+    <AssemblyTitle>MedicalLabAnalyzer</AssemblyTitle>
+    <AssemblyDescription>Offline Medical Laboratory Analysis Application - تطبيق تحليل المختبر الطبي</AssemblyDescription>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifier>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>true</PublishTrimmed>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Entity Framework Core -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+    
+    <!-- Video Processing - Platform Specific -->
+    <PackageReference Include="Emgu.CV" Version="4.8.1.5350" Condition="'$(TargetFramework)' == 'net8.0-windows'" />
+    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.8.1.5350" Condition="'$(TargetFramework)' == 'net8.0-windows'" />
+    <PackageReference Include="Emgu.CV.UI" Version="4.8.1.5350" Condition="'$(TargetFramework)' == 'net8.0-windows'" />
+    
+    <!-- Cross-Platform Video Processing -->
+    <PackageReference Include="FFmpeg.AutoGen" Version="6.1.0" Condition="'$(TargetFramework)' != 'net8.0-windows'" />
+    <PackageReference Include="SkiaSharp" Version="2.88.7" Condition="'$(TargetFramework)' != 'net8.0-windows'" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.7" Condition="'$(TargetFramework)' == 'net8.0-linux'" />
+    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.7" Condition="'$(TargetFramework)' == 'net8.0-macos'" />
+    
+    <!-- PDF Generation -->
+    <PackageReference Include="iText7" Version="8.0.2" />
+    <PackageReference Include="iText7.commons" Version="8.0.2" />
+    
+    <!-- Excel Generation -->
+    <PackageReference Include="EPPlus" Version="7.0.5" />
+    
+    <!-- UI Controls - Platform Specific -->
+    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" Condition="'$(TargetFramework)' == 'net8.0-windows'" />
+    <PackageReference Include="MaterialDesignColors" Version="2.1.4" Condition="'$(TargetFramework)' == 'net8.0-windows'" />
+    
+    <!-- Cross-Platform UI -->
+    <PackageReference Include="Avalonia" Version="11.0.10" Condition="'$(TargetFramework)' != 'net8.0-windows'" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.10" Condition="'$(TargetFramework)' != 'net8.0-windows'" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" Condition="'$(TargetFramework)' != 'net8.0-windows'" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" Condition="'$(TargetFramework)' != 'net8.0-windows'" />
+    
+    <!-- Utilities -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    
+    <!-- Cross-Platform Logging -->
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="5.0.0" />
+    
+    <!-- Platform Detection -->
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Database\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Reports\Templates\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="UserGuides\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Platform-Specific File Includes -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+    <None Update="Resources\app.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
+    <None Update="Resources\app.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

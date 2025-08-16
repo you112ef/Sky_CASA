@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # MedicalLabAnalyzer Application
+  medicallab-analyzer:
+    build: .
+    container_name: medicallab-analyzer
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mount database directory
+      - ./Database:/app/Database
+      # Mount reports directory
+      - ./Reports:/app/Reports
+      # Mount user guides
+      - ./UserGuides:/app/UserGuides
+      # Mount video analysis output
+      - ./VideoAnalysis:/app/VideoAnalysis
+      # Mount logs
+      - ./logs:/app/logs
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    restart: unless-stopped
+    networks:
+      - medicallab-network
+
+  # SQLite Database (Optional - for development)
+  sqlite-db:
+    image: alpine:latest
+    container_name: medicallab-sqlite
+    volumes:
+      - ./Database:/data
+    command: sh -c "apk add --no-cache sqlite && sqlite3 /data/medical_lab.db < /data/create_medical_lab_schema.sql"
+    networks:
+      - medicallab-network
+
+  # FFmpeg Service for Video Processing
+  ffmpeg-service:
+    image: jrottenberg/ffmpeg:latest
+    container_name: medicallab-ffmpeg
+    volumes:
+      - ./VideoAnalysis:/tmp/videos
+    environment:
+      - FFREPORT=file=/tmp/videos/ffmpeg.log
+    networks:
+      - medicallab-network
+
+  # Backup Service
+  backup-service:
+    build: .
+    container_name: medicallab-backup
+    volumes:
+      - ./Database:/app/Database
+      - ./Backups:/app/Backups
+    command: ["dotnet", "MedicalLabAnalyzer.Backup.dll"]
+    environment:
+      - BACKUP_SCHEDULE=0 0 * * *  # Daily at midnight
+      - BACKUP_RETENTION_DAYS=30
+    networks:
+      - medicallab-network
+
+networks:
+  medicallab-network:
+    driver: bridge
+
+volumes:
+  database-data:
+  reports-data:
+  video-analysis-data:
+  backup-data:
