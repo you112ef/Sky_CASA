@@ -88,7 +88,7 @@ export default function ImageAnalysis({ testId, onAnalysisComplete }: ImageAnaly
           }
         }
       },
-      confidence: (Math.random() * 0.3 + 0.7).toFixed(2),
+      confidence: Number((Math.random() * 0.3 + 0.7).toFixed(2)),
       processedAt: new Date(),
       notes: 'تم تحليل الصورة بنجاح. تم اكتشاف خلايا طبيعية مع وجود بعض الخلايا غير الطبيعية.'
     };
