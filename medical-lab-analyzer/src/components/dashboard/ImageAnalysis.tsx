@@ -1,21 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Upload, 
-  Image as ImageIcon, 
-  Activity, 
-  Eye, 
-  Download, 
-  RotateCcw,
-  CheckCircle,
-  AlertCircle,
-  BarChart3
-} from "lucide-react";
+import { ImageIcon, Upload, Eye, RotateCcw, CheckCircle, AlertCircle } from "lucide-react";
 import { ImageAnalysisResult } from "@/types";
+import { imageAnalysisService } from "@/services/imageAnalysisService";
 
 interface ImageAnalysisProps {
   testId: string;
@@ -28,74 +19,89 @@ export default function ImageAnalysis({ testId, onAnalysisComplete }: ImageAnaly
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisResults, setAnalysisResults] = useState<ImageAnalysisResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      setAnalysisResults(null);
+      handleFile(file);
     }
   };
 
-  const handleDrop = (event: React.DragEvent) => {
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      setSelectedFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      setAnalysisResults(null);
+    if (file) {
+      handleFile(file);
     }
   };
 
-  const handleDragOver = (event: React.DragEvent) => {
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
 
-  const simulateAnalysis = async () => {
+  const handleFile = (file: File) => {
+    // التحقق من نوع الملف
+    if (!file.type.startsWith('image/')) {
+      setError('يرجى اختيار ملف صورة صالح');
+      return;
+    }
+
+    // التحقق من حجم الملف (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('حجم الملف يجب أن يكون أقل من 10MB');
+      return;
+    }
+
+    setSelectedFile(file);
+    setError(null);
+    setAnalysisResults(null);
+
+    // إنشاء معاينة للصورة
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+  };
+
+  const startAnalysis = async () => {
     if (!selectedFile) return;
 
     setIsAnalyzing(true);
     setAnalysisProgress(0);
+    setError(null);
 
-    // Simulate analysis progress
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      setAnalysisProgress(i);
-    }
-
-    // Simulate analysis results
-    const mockResults: ImageAnalysisResult = {
-      id: `analysis_${Date.now()}`,
-      imageId: `img_${Date.now()}`,
-      analysisType: 'cell_count',
-      results: {
-        totalCells: Math.floor(Math.random() * 1000) + 500,
-        redBloodCells: Math.floor(Math.random() * 500) + 200,
-        whiteBloodCells: Math.floor(Math.random() * 100) + 50,
-        platelets: Math.floor(Math.random() * 300) + 150,
-        abnormalCells: Math.floor(Math.random() * 10),
-        cellDensity: (Math.random() * 0.8 + 0.2).toFixed(2),
-        colorAnalysis: {
-          dominantColor: '#ff0000',
-          colorDistribution: {
-            red: Math.floor(Math.random() * 100),
-            green: Math.floor(Math.random() * 100),
-            blue: Math.floor(Math.random() * 100)
+    try {
+      // محاكاة تقدم التحليل
+      const progressInterval = setInterval(() => {
+        setAnalysisProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
           }
-        }
-      },
-      confidence: Number((Math.random() * 0.3 + 0.7).toFixed(2)),
-      processedAt: new Date(),
-      notes: 'تم تحليل الصورة بنجاح. تم اكتشاف خلايا طبيعية مع وجود بعض الخلايا غير الطبيعية.'
-    };
+          return prev + 10;
+        });
+      }, 200);
 
-    setAnalysisResults(mockResults);
-    setIsAnalyzing(false);
-    onAnalysisComplete(mockResults);
+      // استخدام خدمة التحليل الحقيقية
+      const results = await imageAnalysisService.analyzeImage(selectedFile);
+      
+      clearInterval(progressInterval);
+      setAnalysisProgress(100);
+
+      setAnalysisResults(results);
+      onAnalysisComplete(results);
+
+      // إعادة تعيين التقدم بعد ثانيتين
+      setTimeout(() => {
+        setAnalysisProgress(0);
+      }, 2000);
+
+    } catch (err) {
+      setError('فشل في تحليل الصورة. يرجى المحاولة مرة أخرى.');
+      console.error('Image analysis failed:', err);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const resetAnalysis = () => {
@@ -103,6 +109,7 @@ export default function ImageAnalysis({ testId, onAnalysisComplete }: ImageAnaly
     setPreviewUrl(null);
     setAnalysisResults(null);
     setAnalysisProgress(0);
+    setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -121,6 +128,15 @@ export default function ImageAnalysis({ testId, onAnalysisComplete }: ImageAnaly
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-center">
+                <AlertCircle className="w-5 h-5 text-red-500 ml-2" />
+                <span className="text-red-700">{error}</span>
+              </div>
+            </div>
+          )}
+
           {!selectedFile ? (
             <div
               className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
@@ -182,19 +198,18 @@ export default function ImageAnalysis({ testId, onAnalysisComplete }: ImageAnaly
                   </p>
                 </div>
                 <Button
-                  onClick={simulateAnalysis}
+                  onClick={startAnalysis}
                   disabled={isAnalyzing}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  <Activity className="w-4 h-4 ml-2" />
-                  {isAnalyzing ? "جاري التحليل..." : "بدء التحليل"}
+                  {isAnalyzing ? 'جاري التحليل...' : 'بدء التحليل'}
                 </Button>
               </div>
 
               {/* Analysis Progress */}
               {isAnalyzing && (
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm text-gray-600">
                     <span>تقدم التحليل</span>
                     <span>{analysisProgress}%</span>
                   </div>
@@ -204,73 +219,39 @@ export default function ImageAnalysis({ testId, onAnalysisComplete }: ImageAnaly
 
               {/* Analysis Results */}
               {analysisResults && (
-                <Card className="bg-green-50 border-green-200">
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-green-800">
-                      <CheckCircle className="w-5 h-5 ml-2" />
-                      نتائج التحليل
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="font-medium">إجمالي الخلايا:</span>
-                          <span className="text-blue-600 font-bold">
-                            {analysisResults.results.totalCells}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">خلايا الدم الحمراء:</span>
-                          <span>{analysisResults.results.redBloodCells}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">خلايا الدم البيضاء:</span>
-                          <span>{analysisResults.results.whiteBloodCells}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">الصفائح الدموية:</span>
-                          <span>{analysisResults.results.platelets}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">الخلايا غير الطبيعية:</span>
-                          <span className="text-red-600 font-bold">
-                            {analysisResults.results.abnormalCells}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="font-medium">كثافة الخلايا:</span>
-                          <span>{analysisResults.results.cellDensity}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">مستوى الثقة:</span>
-                          <span className="text-green-600 font-bold">
-                            {(parseFloat(analysisResults.confidence.toString()) * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                        <div className="pt-2">
-                          <Button size="sm" variant="outline" className="w-full">
-                            <BarChart3 className="w-4 h-4 ml-2" />
-                            عرض التفاصيل
-                          </Button>
-                        </div>
-                        <div>
-                          <Button size="sm" variant="outline" className="w-full">
-                            <Download className="w-4 h-4 ml-2" />
-                            تصدير النتائج
-                          </Button>
-                        </div>
+                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center mb-3">
+                    <CheckCircle className="w-5 h-5 text-green-600 ml-2" />
+                    <h3 className="text-lg font-medium text-green-800">تم التحليل بنجاح</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">معلومات الصورة</h4>
+                      <div className="space-y-1 text-sm text-gray-600">
+                        <p>العرض: {analysisResults.results.imageMetrics?.width}px</p>
+                        <p>الارتفاع: {analysisResults.results.imageMetrics?.height}px</p>
+                        <p>نسبة الأبعاد: {analysisResults.results.imageMetrics?.aspectRatio}</p>
+                        <p>حجم الملف: {analysisResults.results.imageMetrics?.fileSize}</p>
                       </div>
                     </div>
-                    {analysisResults.notes && (
-                      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                        <p className="text-sm text-blue-800">{analysisResults.notes}</p>
+                    
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">نتائج التحليل</h4>
+                      <div className="space-y-1 text-sm text-gray-600">
+                        <p>عدد الخلايا: {analysisResults.results.cellCount}</p>
+                        <p>الخلايا غير الطبيعية: {analysisResults.results.abnormalCells}</p>
+                        <p>كثافة الخلايا: {analysisResults.results.cellDensity}%</p>
+                        <p>مستوى الثقة: {(analysisResults.confidence * 100).toFixed(1)}%</p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 p-3 bg-white rounded border">
+                    <h4 className="font-medium text-gray-900 mb-2">ملاحظات التحليل</h4>
+                    <p className="text-sm text-gray-700">{analysisResults.notes}</p>
+                  </div>
+                </div>
               )}
             </div>
           )}
