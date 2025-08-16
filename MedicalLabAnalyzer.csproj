@@ -7,7 +7,6 @@
     <UseAvalonia Condition="'$(TargetFramework)' != 'net8.0-windows'">true</UseAvalonia>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>Resources\app.ico</ApplicationIcon>
     <AssemblyTitle>MedicalLabAnalyzer</AssemblyTitle>
     <AssemblyDescription>Offline Medical Laboratory Analysis Application - تطبيق تحليل المختبر الطبي</AssemblyDescription>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
@@ -55,8 +54,8 @@
     <!-- Cross-Platform Video Processing -->
     <PackageReference Include="FFmpeg.AutoGen" Version="6.1.0" Condition="'$(TargetFramework)' != 'net8.0-windows'" />
     <PackageReference Include="SkiaSharp" Version="2.88.7" Condition="'$(TargetFramework)' != 'net8.0-windows'" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.7" Condition="'$(TargetFramework)' == 'net8.0-linux'" />
-    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.7" Condition="'$(TargetFramework)' == 'net8.0-macos'" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.7" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.7" Condition="'$(TargetFramework)' == 'net8.0'" />
     
     <!-- PDF Generation -->
     <PackageReference Include="iText7" Version="8.0.2" />
@@ -92,28 +91,18 @@
     <None Update="Database\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Reports\Templates\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="UserGuides\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <!-- Platform-Specific File Includes -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
-    <None Update="Resources\app.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <!-- Windows-specific resources can be added here -->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
-    <None Update="Resources\app.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <!-- Cross-platform resources can be added here -->
   </ItemGroup>
 
 </Project>
