@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net8.0-windows;net8.0-macos;net8.0-linux</TargetFrameworks>
+    <TargetFrameworks>net8.0-windows;net8.0</TargetFrameworks>
     <UseWPF Condition="'$(TargetFramework)' == 'net8.0-windows'">true</UseWPF>
     <UseAvalonia Condition="'$(TargetFramework)' != 'net8.0-windows'">true</UseAvalonia>
     <Nullable>enable</Nullable>
@@ -27,15 +27,8 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-linux'">
-    <OutputPath>bin\$(Configuration)\$(TargetFramework)\linux-x64</OutputPath>
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-macos'">
-    <OutputPath>bin\$(Configuration)\$(TargetFramework)\osx-x64</OutputPath>
-    <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <OutputPath>bin\$(Configuration)\$(TargetFramework)\cross-platform</OutputPath>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 

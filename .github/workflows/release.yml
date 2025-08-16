@@ -54,6 +54,10 @@ jobs:
         brew install ffmpeg
         brew install --cask dotnet
     
+    - name: Restore workloads
+      if: matrix.os == 'macos'
+      run: dotnet workload restore
+    
     - name: Build and publish
       run: |
         if [ "${{ matrix.os }}" = "windows" ]; then
@@ -61,7 +65,7 @@ jobs:
         elif [ "${{ matrix.os }}" = "linux" ]; then
           dotnet publish MedicalLabAnalyzer.Linux.csproj -c Release -r ${{ matrix.target }} --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o publish/${{ matrix.os }}
         else
-          dotnet publish MedicalLabAnalyzer.csproj -c Release -f net8.0-macos -r ${{ matrix.target }} --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o publish/${{ matrix.os }}
+          dotnet publish MedicalLabAnalyzer.csproj -c Release -f net8.0 -r ${{ matrix.target }} --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o publish/${{ matrix.os }}
         fi
     
     - name: Create archive
