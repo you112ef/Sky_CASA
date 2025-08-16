@@ -1,0 +1,5 @@
+/workspace/obj/Release/net8.0/linux-x64/MedicalLabAnalyzer.Linux.csproj.AssemblyReference.cache
+/workspace/obj/Release/net8.0/linux-x64/Avalonia/Resources.Inputs.cache
+/workspace/obj/Release/net8.0/linux-x64/MedicalLabAnalyzer.Linux.GeneratedMSBuildEditorConfig.editorconfig
+/workspace/obj/Release/net8.0/linux-x64/MedicalLabAnalyzer.Linux.csproj.CoreCompileInputs.cache
+/workspace/obj/Release/net8.0/linux-x64/MedicalLabAnalyzer.Linux.sourcelink.json
