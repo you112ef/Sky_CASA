@@ -1,0 +1,76 @@
+# Multi-stage Dockerfile for MedicalLabAnalyzer
+# حل مشاكل البناء باستخدام Docker
+
+# Stage 1: Build stage with .NET 8 SDK
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Set working directory
+WORKDIR /src
+
+# Copy project files first for better caching
+COPY MedicalLabAnalyzer.csproj ./
+COPY Directory.Build.props ./
+COPY Directory.Build.targets ./
+
+# Restore dependencies
+RUN dotnet restore --verbosity normal
+
+# Copy source code
+COPY . .
+
+# Build for multiple platforms
+RUN dotnet build -c Release --no-restore --verbosity normal
+
+# Publish for different platforms
+RUN dotnet publish -c Release -r linux-x64 --self-contained true \
+    -p:PublishSingleFile=true -p:PublishTrimmed=true \
+    -o /app/linux --verbosity normal
+
+RUN dotnet publish -c Release -r win-x64 --self-contained true \
+    -p:PublishSingleFile=true -p:PublishTrimmed=true \
+    -o /app/windows --verbosity normal
+
+RUN dotnet publish -c Release -r osx-x64 --self-contained true \
+    -p:PublishSingleFile=true -p:PublishTrimmed=true \
+    -o /app/macos --verbosity normal
+
+RUN dotnet publish -c Release -r osx-arm64 --self-contained true \
+    -p:PublishSingleFile=true -p:PublishTrimmed=true \
+    -o /app/macos-arm64 --verbosity normal
+
+# Stage 2: Runtime stage
+FROM mcr.microsoft.com/dotnet/runtime:8.0
+
+# Install required packages for video processing
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libgdiplus \
+    libc6-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy published applications
+COPY --from=build /app/linux ./linux
+COPY --from=build /app/windows ./windows
+COPY --from=build /app/macos ./macos
+COPY --from=build /app/macos-arm64 ./macos-arm64
+
+# Make Linux version executable
+RUN chmod +x ./linux/MedicalLabAnalyzer
+
+# Set environment variables
+ENV DOTNET_RUNNING_IN_CONTAINER=true
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+ENV ASPNETCORE_URLS=http://+:8080
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Default command
+CMD ["./linux/MedicalLabAnalyzer"]

@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-windows:
-    runs-on: windows-latest
+    runs-on: windows-server-2025
     steps:
     - uses: actions/checkout@v4
     
@@ -75,7 +75,7 @@ jobs:
         path: MedicalLabAnalyzer-Linux-x64.tar.gz
 
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
     - uses: actions/checkout@v4
     
@@ -106,7 +106,7 @@ jobs:
         path: MedicalLabAnalyzer-macOS-x64.tar.gz
 
   build-macos-arm64:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
     - uses: actions/checkout@v4
     

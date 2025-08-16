@@ -1,0 +1,98 @@
+<Project>
+  <!-- Global build targets for MedicalLabAnalyzer -->
+  
+  <!-- Post-build events -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <!-- Copy required files to output directory -->
+    <ItemGroup>
+      <RequiredFiles Include="Database\**\*" />
+      <RequiredFiles Include="Reports\Templates\**\*" />
+      <RequiredFiles Include="UserGuides\**\*" />
+      <RequiredFiles Include="Resources\**\*" />
+    </ItemGroup>
+    
+    <Copy SourceFiles="@(RequiredFiles)" 
+          DestinationFolder="$(OutputPath)%(RecursiveDir)" />
+  </Target>
+
+  <!-- Clean target -->
+  <Target Name="CleanOutput" AfterTargets="Clean">
+    <RemoveDir Directories="$(OutputPath)" />
+    <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
+  </Target>
+
+  <!-- Platform-specific targets -->
+  <Target Name="SetPlatformProperties" BeforeTargets="PrepareForBuild">
+    <PropertyGroup Condition="'$(Platform)' == 'x64'">
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Platform)' == 'x86'">
+      <PlatformTarget>x86</PlatformTarget>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Platform)' == 'AnyCPU'">
+      <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
+  </Target>
+
+  <!-- Validation target -->
+  <Target Name="ValidateBuild" AfterTargets="Build">
+    <Message Text="Build completed successfully for $(TargetFramework) on $(Platform)" Importance="high" />
+    
+    <!-- Check if output files exist -->
+    <ItemGroup>
+      <OutputFiles Include="$(OutputPath)*.exe" />
+      <OutputFiles Include="$(OutputPath)*.dll" />
+    </ItemGroup>
+    
+    <Message Text="Output files: @(OutputFiles)" Importance="normal" />
+  </Target>
+
+  <!-- Publish target enhancements -->
+  <Target Name="PrepareForPublish" BeforeTargets="Publish">
+    <Message Text="Preparing to publish for $(RuntimeIdentifier)" Importance="high" />
+    
+    <!-- Create publish directory structure -->
+    <MakeDir Directories="$(PublishDir)" />
+    <MakeDir Directories="$(PublishDir)Database" />
+    <MakeDir Directories="$(PublishDir)Reports" />
+    <MakeDir Directories="$(PublishDir)UserGuides" />
+    <MakeDir Directories="$(PublishDir)Resources" />
+  </Target>
+
+  <!-- Post-publish target -->
+  <Target Name="PostPublish" AfterTargets="Publish">
+    <Message Text="Publish completed for $(RuntimeIdentifier)" Importance="high" />
+    
+    <!-- Copy additional files after publish -->
+    <ItemGroup>
+      <PublishFiles Include="Database\**\*" />
+      <PublishFiles Include="Reports\Templates\**\*" />
+      <PublishFiles Include="UserGuides\**\*" />
+      <PublishFiles Include="Resources\**\*" />
+    </ItemGroup>
+    
+    <Copy SourceFiles="@(PublishFiles)" 
+          DestinationFolder="$(PublishDir)%(RecursiveDir)" />
+  </Target>
+
+  <!-- Custom target for multi-platform build -->
+  <Target Name="BuildAllPlatforms">
+    <Message Text="Building for all platforms..." Importance="high" />
+    
+    <!-- Build for Windows -->
+    <MSBuild Projects="$(MSBuildProjectFile)" 
+             Properties="TargetFramework=net8.0-windows;Platform=x64;Configuration=Release" />
+    
+    <!-- Build for Linux -->
+    <MSBuild Projects="$(MSBuildProjectFile)" 
+             Properties="TargetFramework=net8.0-linux;Platform=x64;Configuration=Release" />
+    
+    <!-- Build for macOS -->
+    <MSBuild Projects="$(MSBuildProjectFile)" 
+             Properties="TargetFramework=net8.0-macos;Platform=x64;Configuration=Release" />
+    
+    <Message Text="Multi-platform build completed!" Importance="high" />
+  </Target>
+</Project>
