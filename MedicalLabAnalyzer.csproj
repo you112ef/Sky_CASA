@@ -14,7 +14,7 @@
     <FileVersion>1.0.0.0</FileVersion>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifier>
+    <!-- Removed problematic RuntimeIdentifier - will be set per platform -->
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
