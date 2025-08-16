@@ -313,7 +313,7 @@ cd Sky_CASA
 .\builds\windows\MedicalLabAnalyzer.exe
 
 # Linux/macOS
-./builds/linux/MedicalLabAnalyzer
+./builds\linux\MedicalLabAnalyzer
 
 # 4. تسجيل الدخول
 # Username: admin
