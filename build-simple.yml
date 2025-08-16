@@ -1,0 +1,48 @@
+name: Simple Build - MedicalLabAnalyzer
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # للاختبار اليدوي
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  simple-build:
+    name: Simple Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Test
+      run: dotnet test --no-build --configuration Release
+    
+    - name: Build artifacts info
+      run: |
+        echo "Build completed successfully!"
+        echo "Output directory: $(pwd)/bin/Release"
+        ls -la bin/Release/
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-output
+        path: bin/Release/
+        retention-days: 7
