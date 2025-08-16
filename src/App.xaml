@@ -1,0 +1,131 @@
+<Application x:Class="MedicalLabAnalyzer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             StartupUri="Views/MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Material Design -->
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="Blue" SecondaryColor="Teal" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                
+                <!-- Custom Styles -->
+                <ResourceDictionary Source="Styles/Colors.xaml"/>
+                <ResourceDictionary Source="Styles/Buttons.xaml"/>
+                <ResourceDictionary Source="Styles/TextBlocks.xaml"/>
+                <ResourceDictionary Source="Styles/DataGrid.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Global Styles -->
+            <Style TargetType="Window">
+                <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"/>
+                <Setter Property="FontFamily" Value="{DynamicResource MaterialDesignFont}"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+
+            <Style TargetType="Page">
+                <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"/>
+                <Setter Property="FontFamily" Value="{DynamicResource MaterialDesignFont}"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+
+            <!-- Arabic Text Support -->
+            <Style x:Key="ArabicTextBlock" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Arial"/>
+                <Setter Property="FlowDirection" Value="RightToLeft"/>
+                <Setter Property="TextAlignment" Value="Right"/>
+            </Style>
+
+            <Style x:Key="ArabicTextBox" TargetType="TextBox">
+                <Setter Property="FontFamily" Value="Arial"/>
+                <Setter Property="FlowDirection" Value="RightToLeft"/>
+                <Setter Property="TextAlignment" Value="Right"/>
+            </Style>
+
+            <!-- Status Colors -->
+            <SolidColorBrush x:Key="StatusInProgress" Color="#FF9800"/>
+            <SolidColorBrush x:Key="StatusCompleted" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="StatusCancelled" Color="#F44336"/>
+            <SolidColorBrush x:Key="StatusPending" Color="#9E9E9E"/>
+
+            <!-- Priority Colors -->
+            <SolidColorBrush x:Key="PriorityLow" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="PriorityNormal" Color="#2196F3"/>
+            <SolidColorBrush x:Key="PriorityHigh" Color="#FF9800"/>
+            <SolidColorBrush x:Key="PriorityUrgent" Color="#F44336"/>
+
+            <!-- Sample Quality Colors -->
+            <SolidColorBrush x:Key="QualityExcellent" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="QualityGood" Color="#8BC34A"/>
+            <SolidColorBrush x:Key="QualityFair" Color="#FFC107"/>
+            <SolidColorBrush x:Key="QualityPoor" Color="#FF9800"/>
+            <SolidColorBrush x:Key="QualityVeryPoor" Color="#F44336"/>
+
+            <!-- Morphology Grade Colors -->
+            <SolidColorBrush x:Key="MorphologyExcellent" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="MorphologyGood" Color="#8BC34A"/>
+            <SolidColorBrush x:Key="MorphologyFair" Color="#FFC107"/>
+            <SolidColorBrush x:Key="MorphologyPoor" Color="#FF9800"/>
+            <SolidColorBrush x:Key="MorphologyVeryPoor" Color="#F44336"/>
+
+            <!-- Report Status Colors -->
+            <SolidColorBrush x:Key="ReportDraft" Color="#9E9E9E"/>
+            <SolidColorBrush x:Key="ReportFinal" Color="#2196F3"/>
+            <SolidColorBrush x:Key="ReportApproved" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="ReportPrinted" Color="#795548"/>
+
+            <!-- Backup Status Colors -->
+            <SolidColorBrush x:Key="BackupInProgress" Color="#FF9800"/>
+            <SolidColorBrush x:Key="BackupCompleted" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="BackupFailed" Color="#F44336"/>
+
+            <!-- Video Processing Status Colors -->
+            <SolidColorBrush x:Key="VideoPending" Color="#9E9E9E"/>
+            <SolidColorBrush x:Key="VideoProcessing" Color="#FF9800"/>
+            <SolidColorBrush x:Key="VideoCompleted" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="VideoFailed" Color="#F44336"/>
+
+            <!-- CASA Metrics Colors -->
+            <SolidColorBrush x:Key="CASAExcellent" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="CASAGood" Color="#8BC34A"/>
+            <SolidColorBrush x:Key="CASAFair" Color="#FFC107"/>
+            <SolidColorBrush x:Key="CASAPoor" Color="#FF9800"/>
+            <SolidColorBrush x:Key="CASAVeryPoor" Color="#F44336"/>
+
+            <!-- Gender Colors -->
+            <SolidColorBrush x:Key="GenderMale" Color="#2196F3"/>
+            <SolidColorBrush x:Key="GenderFemale" Color="#E91E63"/>
+            <SolidColorBrush x:Key="GenderOther" Color="#9C27B0"/>
+
+            <!-- Role Colors -->
+            <SolidColorBrush x:Key="RoleAdmin" Color="#F44336"/>
+            <SolidColorBrush x:Key="RoleDoctor" Color="#2196F3"/>
+            <SolidColorBrush x:Key="RoleTechnician" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="RoleViewer" Color="#9E9E9E"/>
+
+            <!-- Exam Type Colors -->
+            <SolidColorBrush x:Key="ExamTypeSemenAnalysis" Color="#2196F3"/>
+            <SolidColorBrush x:Key="ExamTypeSpermMorphology" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="ExamTypeMotilityTest" Color="#FF9800"/>
+            <SolidColorBrush x:Key="ExamTypeCombined" Color="#9C27B0"/>
+
+            <!-- Chamber Type Colors -->
+            <SolidColorBrush x:Key="ChamberMakler" Color="#2196F3"/>
+            <SolidColorBrush x:Key="ChamberNeubauer" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="ChamberMicroCell" Color="#FF9800"/>
+            <SolidColorBrush x:Key="ChamberOther" Color="#9E9E9E"/>
+
+            <!-- Report Type Colors -->
+            <SolidColorBrush x:Key="ReportTypePreliminary" Color="#FF9800"/>
+            <SolidColorBrush x:Key="ReportTypeFinal" Color="#2196F3"/>
+            <SolidColorBrush x:Key="ReportTypeSummary" Color="#4CAF50"/>
+
+            <!-- Backup Type Colors -->
+            <SolidColorBrush x:Key="BackupTypeManual" Color="#2196F3"/>
+            <SolidColorBrush x:Key="BackupTypeAutomatic" Color="#4CAF50"/>
+            <SolidColorBrush x:Key="BackupTypeScheduled" Color="#FF9800"/>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
