@@ -7,6 +7,7 @@ on:
     branches: [ main ]
   release:
     types: [ published ]
+  workflow_dispatch:
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -33,17 +34,17 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
     
     - name: Restore dependencies
-      run: dotnet restore --verbosity normal
+      run: dotnet restore MedicalLabAnalyzer.csproj --verbosity normal
     
     - name: Build Windows x64
-      run: dotnet build -c Release --no-restore --verbosity normal
+      run: dotnet build MedicalLabAnalyzer.csproj -c Release -f net8.0-windows --no-restore --verbosity normal
     
     - name: Test Windows
-      run: dotnet test --no-build --verbosity normal --configuration Release
+      run: dotnet test MedicalLabAnalyzer.csproj -f net8.0-windows --no-build --verbosity normal --configuration Release
     
     - name: Publish Windows x64
       run: |
-        dotnet publish -c Release -r win-x64 --self-contained true `
+        dotnet publish MedicalLabAnalyzer.csproj -c Release -f net8.0-windows -r win-x64 --self-contained true `
           -p:PublishSingleFile=true -p:PublishTrimmed=true `
           -p:DebugType=None -p:DebugSymbols=false `
           -o publish/windows --verbosity normal
@@ -81,23 +82,23 @@ jobs:
         sudo apt-get install -y ffmpeg libgdiplus libc6-dev
     
     - name: Restore dependencies
-      run: dotnet restore --verbosity normal
+      run: dotnet restore MedicalLabAnalyzer.Linux.csproj --verbosity normal
     
     - name: Build Linux x64
-      run: dotnet build -c Release --no-restore --verbosity normal
+      run: dotnet build MedicalLabAnalyzer.Linux.csproj -c Release --no-restore --verbosity normal
     
     - name: Test Linux
-      run: dotnet test --no-build --verbosity normal --configuration Release
+      run: dotnet test MedicalLabAnalyzer.Linux.csproj --no-build --verbosity normal --configuration Release
     
     - name: Publish Linux x64
       run: |
-        dotnet publish -c Release -r linux-x64 --self-contained true \
+        dotnet publish MedicalLabAnalyzer.Linux.csproj -c Release -r linux-x64 --self-contained true \
           -p:PublishSingleFile=true -p:PublishTrimmed=true \
           -p:DebugType=None -p:DebugSymbols=false \
           -o publish/linux --verbosity normal
     
     - name: Make executable
-      run: chmod +x publish/linux/MedicalLabAnalyzer
+      run: chmod +x publish/linux/MedicalLabAnalyzer.Linux
     
     - name: Create Linux TAR.GZ
       run: tar -czf MedicalLabAnalyzer-Linux-x64.tar.gz -C publish/linux .
@@ -131,17 +132,17 @@ jobs:
         brew install --cask dotnet
     
     - name: Restore dependencies
-      run: dotnet restore --verbosity normal
+      run: dotnet restore MedicalLabAnalyzer.csproj --verbosity normal
     
     - name: Build macOS x64
-      run: dotnet build -c Release --no-restore --verbosity normal
+      run: dotnet build MedicalLabAnalyzer.csproj -c Release -f net8.0-macos --no-restore --verbosity normal
     
     - name: Test macOS
-      run: dotnet test --no-build --verbosity normal --configuration Release
+      run: dotnet test MedicalLabAnalyzer.csproj -f net8.0-macos --no-build --verbosity normal --configuration Release
     
     - name: Publish macOS x64
       run: |
-        dotnet publish -c Release -r osx-x64 --self-contained true \
+        dotnet publish MedicalLabAnalyzer.csproj -c Release -f net8.0-macos -r osx-x64 --self-contained true \
           -p:PublishSingleFile=true -p:PublishTrimmed=true \
           -p:DebugType=None -p:DebugSymbols=false \
           -o publish/macos --verbosity normal
@@ -181,17 +182,17 @@ jobs:
         brew install --cask dotnet
     
     - name: Restore dependencies
-      run: dotnet restore --verbosity normal
+      run: dotnet restore MedicalLabAnalyzer.csproj --verbosity normal
     
     - name: Build macOS ARM64
-      run: dotnet build -c Release --no-restore --verbosity normal
+      run: dotnet build MedicalLabAnalyzer.csproj -c Release -f net8.0-macos --no-restore --verbosity normal
     
     - name: Test macOS ARM64
-      run: dotnet test --no-build --verbosity normal --configuration Release
+      run: dotnet test MedicalLabAnalyzer.csproj -f net8.0-macos --no-build --verbosity normal --configuration Release
     
     - name: Publish macOS ARM64
       run: |
-        dotnet publish -c Release -r osx-arm64 --self-contained true \
+        dotnet publish MedicalLabAnalyzer.csproj -c Release -f net8.0-macos -r osx-arm64 --self-contained true \
           -p:PublishSingleFile=true -p:PublishTrimmed=true \
           -p:DebugType=None -p:DebugSymbols=false \
           -o publish/macos-arm64 --verbosity normal
@@ -207,6 +208,37 @@ jobs:
       with:
         name: MedicalLabAnalyzer-macOS-ARM64
         path: MedicalLabAnalyzer-macOS-ARM64.tar.gz
+        retention-days: 30
+
+  build-nextjs:
+    name: Build Next.js Web Application
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: medical-lab-analyzer/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: medical-lab-analyzer
+      run: npm ci
+    
+    - name: Build Next.js application
+      working-directory: medical-lab-analyzer
+      run: npm run build
+    
+    - name: Upload Next.js build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: NextJS-Build
+        path: medical-lab-analyzer/.next/
         retention-days: 30
 
   build-docker:
@@ -237,7 +269,7 @@ jobs:
   create-release:
     name: Create Release Assets
     runs-on: ubuntu-latest
-    needs: [build-windows, build-linux, build-macos, build-macos-arm64]
+    needs: [build-windows, build-linux, build-macos, build-macos-arm64, build-nextjs]
     if: github.event_name == 'release'
     timeout-minutes: 15
     

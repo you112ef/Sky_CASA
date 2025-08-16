@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   quick-build:
@@ -30,13 +31,13 @@ jobs:
         sudo apt-get install -y ffmpeg libgdiplus
     
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore MedicalLabAnalyzer.Linux.csproj
     
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build MedicalLabAnalyzer.Linux.csproj --configuration Release --no-restore
     
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test MedicalLabAnalyzer.Linux.csproj --no-build --verbosity normal
     
     - name: Build Docker image
       run: docker build -t medicallab-analyzer:latest .
@@ -48,4 +49,32 @@ jobs:
         path: |
           bin/
           obj/
+        retention-days: 1
+
+  quick-nextjs-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: medical-lab-analyzer/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: medical-lab-analyzer
+      run: npm ci
+    
+    - name: Build Next.js application
+      working-directory: medical-lab-analyzer
+      run: npm run build
+    
+    - name: Upload Next.js build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nextjs-build-artifacts
+        path: medical-lab-analyzer/.next/
         retention-days: 1

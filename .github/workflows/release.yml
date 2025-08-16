@@ -1,0 +1,186 @@
+name: Create Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build-all-platforms:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: windows
+            target: win-x64
+            file: MedicalLabAnalyzer-Windows-x64.zip
+          - os: linux
+            target: linux-x64
+            file: MedicalLabAnalyzer-Linux-x64.tar.gz
+          - os: macos
+            target: osx-x64
+            file: MedicalLabAnalyzer-macOS-x64.tar.gz
+          - os: macos-arm64
+            target: osx-arm64
+            file: MedicalLabAnalyzer-macOS-ARM64.tar.gz
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Setup platform-specific tools
+      if: matrix.os == 'windows'
+      uses: microsoft/setup-msbuild@v1.1
+    
+    - name: Install system dependencies
+      if: matrix.os == 'linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg libgdiplus libc6-dev
+    
+    - name: Install system dependencies
+      if: matrix.os == 'macos'
+      run: |
+        brew install ffmpeg
+        brew install --cask dotnet
+    
+    - name: Build and publish
+      run: |
+        if [ "${{ matrix.os }}" = "windows" ]; then
+          dotnet publish MedicalLabAnalyzer.csproj -c Release -f net8.0-windows -r ${{ matrix.target }} --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o publish/${{ matrix.os }}
+        elif [ "${{ matrix.os }}" = "linux" ]; then
+          dotnet publish MedicalLabAnalyzer.Linux.csproj -c Release -r ${{ matrix.target }} --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o publish/${{ matrix.os }}
+        else
+          dotnet publish MedicalLabAnalyzer.csproj -c Release -f net8.0-macos -r ${{ matrix.target }} --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o publish/${{ matrix.os }}
+        fi
+    
+    - name: Create archive
+      if: matrix.os == 'windows'
+      run: |
+        Compress-Archive -Path "publish/${{ matrix.os }}/*" -DestinationPath "${{ matrix.file }}" -Force
+    
+    - name: Create archive
+      if: matrix.os != 'windows'
+      run: |
+        tar -czf ${{ matrix.file }} -C publish/${{ matrix.os }} .
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.file }}
+        path: ${{ matrix.file }}
+
+  build-nextjs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: medical-lab-analyzer/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: medical-lab-analyzer
+      run: npm ci
+    
+    - name: Build Next.js application
+      working-directory: medical-lab-analyzer
+      run: npm run build
+    
+    - name: Create Next.js archive
+      run: tar -czf MedicalLabAnalyzer-NextJS.tar.gz -C medical-lab-analyzer/.next .
+    
+    - name: Upload Next.js artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MedicalLabAnalyzer-NextJS.tar.gz
+        path: MedicalLabAnalyzer-NextJS.tar.gz
+
+  create-release:
+    needs: [build-all-platforms, build-nextjs]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/MedicalLabAnalyzer-Windows-x64.zip
+        asset_name: MedicalLabAnalyzer-Windows-x64.zip
+        asset_content_type: application/zip
+    
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/MedicalLabAnalyzer-Linux-x64.tar.gz
+        asset_name: MedicalLabAnalyzer-Linux-x64.tar.gz
+        asset_content_type: application/gzip
+    
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/MedicalLabAnalyzer-macOS-x64.tar.gz
+        asset_name: MedicalLabAnalyzer-macOS-x64.tar.gz
+        asset_content_type: application/gzip
+    
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/MedicalLabAnalyzer-macOS-ARM64.tar.gz
+        asset_name: MedicalLabAnalyzer-macOS-ARM64.tar.gz
+        asset_content_type: application/gzip
+    
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/MedicalLabAnalyzer-NextJS.tar.gz
+        asset_name: MedicalLabAnalyzer-NextJS.tar.gz
+        asset_content_type: application/gzip
