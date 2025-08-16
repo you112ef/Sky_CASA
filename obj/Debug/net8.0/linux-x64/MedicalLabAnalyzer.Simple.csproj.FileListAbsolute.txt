@@ -1,4 +1,0 @@
-/workspace/obj/Debug/net8.0/linux-x64/MedicalLabAnalyzer.Simple.csproj.AssemblyReference.cache
-/workspace/obj/Debug/net8.0/linux-x64/MedicalLabAnalyzer.Simple.GeneratedMSBuildEditorConfig.editorconfig
-/workspace/obj/Debug/net8.0/linux-x64/MedicalLabAnalyzer.Simple.csproj.CoreCompileInputs.cache
-/workspace/obj/Debug/net8.0/linux-x64/MedicalLabAnalyzer.Simple.sourcelink.json
